@@ -1,5 +1,4 @@
-use std::io::BufRead;
-use std::{fs, io};
+use std::fs;
 
 /*
  * Day 1 Rules:
@@ -7,6 +6,22 @@ use std::{fs, io};
  * Dial Min: 0(rolls over to 99 when turning left)
  * Dial Start: 50
  */
+
+/// Reads and parses the input file into a vector of (direction, amount) tuples
+/// Direction is true for Right, false for Left
+fn read_input(input: &str) -> Result<Vec<(bool, i32)>, std::io::Error> {
+    let contents = fs::read_to_string(input)?;
+    let instructions: Vec<(bool, i32)> = contents
+        .lines()
+        .map(|line| {
+            let bytes = line.as_bytes();
+            let direction = bytes[0] == b'R';
+            let amount = line[1..].parse::<i32>().unwrap();
+            (direction, amount)
+        })
+        .collect();
+    Ok(instructions)
+}
 
 /// Part 1 of Day 1
 ///
@@ -17,23 +32,20 @@ use std::{fs, io};
 ///
 /// * `input` - the path of the input file to read
 pub fn part1(input: &str) -> Result<i32, std::io::Error> {
+    let instructions = read_input(input)?;
     let mut dial = 50;
     let mut count = 0;
-    let file = fs::File::open(input)?;
-    let reader = io::BufReader::new(file);
 
-    for line in reader.lines() {
-        let line = line?;
-        if line.chars().nth(0) == Some('L') {
-            dial = (dial + 100 - (line[1..].parse::<i32>().unwrap() % 100)) % 100;
-        } else if line.chars().nth(0) == Some('R') {
-            dial = (dial + 100 + (line[1..].parse::<i32>().unwrap() % 100)) % 100;
+    for (is_right, amount) in instructions {
+        let partial = amount % 100;
+        if is_right {
+            dial = (dial + partial) % 100;
         } else {
-            panic!("Invalid Input Line");
+            dial = (dial + 100 - partial) % 100;
         }
 
         if dial == 0 {
-            count = count + 1;
+            count += 1;
         }
     }
 
@@ -47,29 +59,28 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
 /// * 'input' - the filename
 ///
 pub fn part2(input: &str) -> Result<i32, std::io::Error> {
+    let instructions = read_input(input)?;
     let mut dial = 50;
     let mut count = 0;
-    let file = fs::File::open(input)?;
-    let reader = io::BufReader::new(file);
 
-    for line in reader.lines() {
-        let line = line?;
-        let amount = line[1..].parse::<i32>().unwrap();
+    for (is_right, amount) in instructions {
         let full_rotations = amount / 100;
         let partial_amount = amount % 100;
 
-        if line.chars().nth(0) == Some('L') {
-            if dial != 0 && dial - partial_amount <= 0 {
-                count += 1;
-            }
-            dial = (dial + 100 - partial_amount) % 100;
-        } else if line.chars().nth(0) == Some('R') {
+        if is_right {
+            // Check if partial rotation crosses 99->0 boundary
+            // But not if we're already at 0
             if dial != 0 && dial + partial_amount > 99 {
                 count += 1;
             }
             dial = (dial + partial_amount) % 100;
         } else {
-            panic!("Invalid Input Line");
+            // Check if partial rotation crosses 0->99 boundary or lands on 0
+            // But not if we're already at 0
+            if dial != 0 && dial - partial_amount <= 0 {
+                count += 1;
+            }
+            dial = (dial + 100 - partial_amount) % 100;
         }
 
         count += full_rotations;
