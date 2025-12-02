@@ -68,15 +68,11 @@ pub fn part2(input: &str) -> Result<i32, std::io::Error> {
         let partial_amount = amount % 100;
 
         if is_right {
-            // Check if partial rotation crosses 99->0 boundary
-            // But not if we're already at 0
             if dial != 0 && dial + partial_amount > 99 {
                 count += 1;
             }
             dial = (dial + partial_amount) % 100;
         } else {
-            // Check if partial rotation crosses 0->99 boundary or lands on 0
-            // But not if we're already at 0
             if dial != 0 && dial - partial_amount <= 0 {
                 count += 1;
             }
