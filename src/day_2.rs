@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs;
 
 fn read_input(input: &str) -> Result<Vec<(i64, i64)>, std::io::Error> {
@@ -37,4 +38,35 @@ pub fn part1(input: &str) -> Result<i64, std::io::Error> {
     Ok(sum)
 }
 
-pub fn part2(input: &str) {}
+/// new rule: any number with a repeating sequence >= 2x
+/// is valid, sum those
+pub fn part2(input: &str) -> Result<i64, std::io::Error> {
+    let mut sum = 0;
+    let vals = read_input(input)?;
+    for (start, end) in vals {
+        'num_loop: for num in start..=end {
+            let digits = num.ilog10() + 1;
+            let half_digits = digits / 2;
+            'len_loop: for i in 1..=half_digits {
+                if digits % i != 0 {
+                    continue; // pattern length must divide evenly into total digits
+                }
+                let divisor = 10i64.pow(i);
+                let mut remaining = num;
+                let s1 = remaining % divisor;
+                remaining /= divisor;
+
+                while remaining > 0 {
+                    let s2 = remaining % divisor;
+                    if s1 != s2 {
+                        continue 'len_loop; // pattern broke, try next length
+                    }
+                    remaining /= divisor;
+                }
+                sum += num;
+                continue 'num_loop;
+            }
+        }
+    }
+    Ok(sum)
+}
