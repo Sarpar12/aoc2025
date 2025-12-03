@@ -1,6 +1,6 @@
-use std::collections::HashSet;
 use std::fs;
 
+#[allow(dead_code)]
 fn read_input(input: &str) -> Result<Vec<(i64, i64)>, std::io::Error> {
     let contents = fs::read_to_string(input)?;
     let vals: Vec<(i64, i64)> = contents
@@ -17,6 +17,7 @@ fn read_input(input: &str) -> Result<Vec<(i64, i64)>, std::io::Error> {
 
 /// sums all numbers that contains two copies of a number inside
 /// ie: 11, 22, 1212
+#[allow(dead_code)]
 pub fn part1(input: &str) -> Result<i64, std::io::Error> {
     let mut sum: i64 = 0;
     let vals = read_input(input)?;
@@ -40,6 +41,7 @@ pub fn part1(input: &str) -> Result<i64, std::io::Error> {
 
 /// new rule: any number with a repeating sequence >= 2x
 /// is valid, sum those
+#[allow(dead_code)]
 pub fn part2(input: &str) -> Result<i64, std::io::Error> {
     let mut sum = 0;
     let vals = read_input(input)?;

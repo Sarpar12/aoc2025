@@ -1,9 +1,10 @@
 mod day_1;
 mod day_2;
+mod day_3;
 
 fn main() {
     // Part 1
-    let p1_out = match day_2::part1("./src/Inputs/D2.txt") {
+    let p1_out = match day_3::part1("./src/Inputs/D3.txt") {
         Ok(value) => value,
         Err(e) => panic!("Error: {}", e),
     };

@@ -9,6 +9,7 @@ use std::fs;
 
 /// Reads and parses the input file into a vector of (direction, amount) tuples
 /// Direction is true for Right, false for Left
+#[allow(dead_code)]
 fn read_input(input: &str) -> Result<Vec<(bool, i32)>, std::io::Error> {
     let contents = fs::read_to_string(input)?;
     let instructions: Vec<(bool, i32)> = contents
@@ -31,6 +32,7 @@ fn read_input(input: &str) -> Result<Vec<(bool, i32)>, std::io::Error> {
 /// # Arguments
 ///
 /// * `input` - the path of the input file to read
+#[allow(dead_code)]
 pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     let instructions = read_input(input)?;
     let mut dial = 50;
@@ -58,6 +60,7 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
 ///
 /// * 'input' - the filename
 ///
+#[allow(dead_code)]
 pub fn part2(input: &str) -> Result<i32, std::io::Error> {
     let instructions = read_input(input)?;
     let mut dial = 50;
