@@ -40,3 +40,39 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     }
     Ok(sum)
 }
+
+pub fn part2(input: &str) -> Result<i64, std::io::Error> {
+    let mut sum: i64 = 0;
+    let vals = read_input(input)?;
+    for num in vals {
+        let digits: Vec<i32> = num
+            .chars()
+            .map(|c| c.to_digit(10).unwrap() as i32)
+            .collect();
+
+        let n = digits.len();
+        let k = 12;
+        let mut drops_allowed = n - k; 
+
+        let mut batteries: Vec<i32> = Vec::with_capacity(k);
+
+        for d in digits {
+            while !batteries.is_empty() && d > *batteries.last().unwrap() && drops_allowed > 0 {
+                batteries.pop();
+                drops_allowed -= 1;
+            }
+            if batteries.len() < k {
+                batteries.push(d);
+            } else {
+                drops_allowed -= 1;
+            }
+        }
+
+        let mut result: i64 = 0;
+        for b in batteries.iter() {
+            result = result * 10 + (*b as i64);
+        }
+        sum += result;
+    }
+    Ok(sum)
+}
