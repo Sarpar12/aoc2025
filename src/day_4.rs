@@ -11,18 +11,16 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     let rows = vals.len();
     let cols = if rows > 0 { vals[0].len() } else { 0 };
 
-    // Initialize num_arr with same dimensions as vals, filled with 0s
     let mut num_arr: Vec<Vec<i32>> = vec![vec![0; cols]; rows];
 
     // For each '@' in vals, add 1 to adjacent cells in num_arr
     for row in 0..rows {
         for col in 0..cols {
             if vals[row][col] == '@' {
-                // Check all 8 adjacent cells
                 for dr in -1i32..=1 {
                     for dc in -1i32..=1 {
                         if dr == 0 && dc == 0 {
-                            continue; // Skip the cell itself
+                            continue; 
                         }
                         let new_row = row as i32 + dr;
                         let new_col = col as i32 + dc;
@@ -38,12 +36,6 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
                 }
             }
         }
-    }
-
-    // Debug print num_arr
-    println!("num_arr:");
-    for row in &num_arr {
-        println!("{:?}", row);
     }
 
     let mut count = 0;
