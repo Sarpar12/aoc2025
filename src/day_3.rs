@@ -1,5 +1,6 @@
 use std::fs;
 
+#[allow(dead_code)]
 fn read_input(input: &str) -> Result<Vec<String>, std::io::Error> {
     let contents = fs::read_to_string(input)?;
     let vals: Vec<String> = contents
@@ -10,6 +11,7 @@ fn read_input(input: &str) -> Result<Vec<String>, std::io::Error> {
     Ok(vals)
 }
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     let mut sum = 0;
     let vals = read_input(input)?;
@@ -41,6 +43,7 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     Ok(sum)
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &str) -> Result<i64, std::io::Error> {
     let mut sum: i64 = 0;
     let vals = read_input(input)?;
@@ -52,7 +55,7 @@ pub fn part2(input: &str) -> Result<i64, std::io::Error> {
 
         let n = digits.len();
         let k = 12;
-        let mut drops_allowed = n - k; 
+        let mut drops_allowed = n - k;
 
         let mut batteries: Vec<i32> = Vec::with_capacity(k);
 
