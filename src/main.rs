@@ -5,7 +5,7 @@ mod day_4;
 
 fn main() {
     // Part 1
-    let p1_out = match day_3::part1("./src/Inputs/D3.txt") {
+    let p1_out = match day_4::part1("./src/Inputs/D4.txt") {
         Ok(value) => value,
         Err(e) => panic!("Error: {}", e),
     };
