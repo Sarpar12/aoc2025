@@ -69,7 +69,6 @@ pub fn part2(input: &str) -> i64 {
 
     // Read from right to left
     for i in (-1..=max_len as isize).rev() {
-        // Build num_buf from digits at this column across all num rows
         let mut num_buf: i64 = 0;
         let mut has_digit = false;
 
@@ -88,7 +87,6 @@ pub fn part2(input: &str) -> i64 {
             stack.push(num_buf);
         }
 
-        // When we hit a space column, process the stack
         if (!has_digit) && !stack.is_empty() {
             let current_op = ops_str.trim().chars().last().unwrap_or(' ');
             ops_str = ops_str.trim().trim_end_matches(current_op).to_string();
