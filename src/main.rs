@@ -10,6 +10,6 @@ fn main() {
     let p1_out = day_6::part1("./src/Inputs/D6.txt");
     println!("Part 1 output: {p1_out}!");
     // Part 2
-    let p2_out = day_6::part2("./src/Inputs/test.txt");
+    let p2_out = day_6::part2("./src/Inputs/D6.txt");
     println!("Part 2 output: {p2_out}!");
 }
