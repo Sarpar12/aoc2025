@@ -1,5 +1,6 @@
 use std::fs;
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> Result<i64, std::io::Error> {
     let input = fs::read_to_string(input)?;
     let normalized = input.replace("\r\n", "\n");
@@ -53,6 +54,7 @@ pub fn part1(input: &str) -> Result<i64, std::io::Error> {
 }
 
 /// Binary search to check if a number is within any of the sorted, merged ranges
+#[allow(dead_code)]
 fn is_in_ranges(ranges: &[(i64, i64)], num: i64) -> bool {
     // Find the rightmost range whose start <= num
     let idx = ranges.partition_point(|r| r.0 <= num);
@@ -64,6 +66,7 @@ fn is_in_ranges(ranges: &[(i64, i64)], num: i64) -> bool {
     num >= start && num <= end
 }
 
+#[allow(dead_code)]
 pub fn part2(path: &str) -> Result<i64, std::io::Error> {
     let input = fs::read_to_string(path)?;
     let normalized = input.replace("\r\n", "\n");

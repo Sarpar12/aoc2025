@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::fs;
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     let contents = fs::read_to_string(input)?;
     let vals: Vec<Vec<char>> = contents
@@ -51,6 +52,7 @@ pub fn part1(input: &str) -> Result<i32, std::io::Error> {
     Ok(count as i32)
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &str) -> Result<i32, std::io::Error> {
     let contents = fs::read_to_string(input)?;
     let mut vals: Vec<Vec<char>> = contents
