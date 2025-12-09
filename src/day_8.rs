@@ -60,11 +60,8 @@ pub fn part1(input: &str, max_pairs: usize) -> usize {
     top3.iter().product()
 }
 
-
 pub fn part2(input: &str) -> usize {
     let content = std::fs::read_to_string(input).expect("failed to read input file");
-
-    // Parse boxes
     let boxes: Vec<(i64, i64, i64)> = content
         .lines()
         .map(str::trim)
@@ -79,8 +76,6 @@ pub fn part2(input: &str) -> usize {
         .collect();
 
     let n = boxes.len();
-
-    // Generate all pairs with distances
     let mut pairs: Vec<(usize, usize, f64)> = Vec::with_capacity(n*(n-1)/2);
     for i in 0..n {
         for j in i+1..n {
@@ -104,7 +99,6 @@ pub fn part2(input: &str) -> usize {
     }
 
     let mut last_pair = (0, 0, 0.0);
-
     for &(i, j, dist) in &pairs {
         let root_i = find(&mut parent, i);
         let root_j = find(&mut parent, j);
@@ -119,7 +113,5 @@ pub fn part2(input: &str) -> usize {
             }
         }
     }
-
-    // Return product of x-coordinates of the last merged pair
     (boxes[last_pair.0].0 * boxes[last_pair.1].0) as usize
 }

@@ -1,5 +1,6 @@
 use std::fs;
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> i64 {
     let contents = fs::read_to_string(input).unwrap();
     let normalized = contents.replace("\r\n", "\n");
@@ -43,6 +44,7 @@ pub fn part1(input: &str) -> i64 {
     sum
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &str) -> i64 {
     let contents = fs::read_to_string(input).unwrap();
     let normalized = contents.replace("\r\n", "\n");

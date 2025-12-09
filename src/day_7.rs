@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use std::fs;
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> i32 {
     let contents = std::fs::read_to_string(input).unwrap();
     let normalized = contents.replace("\r\n", "\n");
@@ -8,7 +9,7 @@ pub fn part1(input: &str) -> i32 {
     let mut beams = HashSet::new();
     beams.insert(lines.next().unwrap().find('S').unwrap());
     let mut split_count = 0;
-    
+
     for line in lines {
         if line.is_empty() {
             break;
@@ -32,7 +33,7 @@ pub fn part1(input: &str) -> i32 {
     split_count
 }
 
-
+#[allow(dead_code)]
 pub fn part2(input: &str) -> u128 {
     let contents = fs::read_to_string(input).unwrap();
     let normalized = contents.replace("\r\n", "\n");
@@ -48,12 +49,16 @@ pub fn part2(input: &str) -> u128 {
     counts[start_col] = 1;
 
     for line in lines.iter().skip(start_row + 1) {
-        if line.is_empty() { break; }
+        if line.is_empty() {
+            break;
+        }
         let mut next_counts = vec![0u128; width];
 
         for x in 0..width {
             let c = counts[x];
-            if c == 0 { continue; }
+            if c == 0 {
+                continue;
+            }
             if line.as_bytes()[x] == b'^' {
                 if x > 0 {
                     next_counts[x - 1] += c;
@@ -69,5 +74,3 @@ pub fn part2(input: &str) -> u128 {
     }
     counts.iter().sum()
 }
-
-
