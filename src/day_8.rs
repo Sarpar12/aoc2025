@@ -1,23 +1,6 @@
 use std::fs;
 use std::collections::HashMap;
 
-#[derive(Debug)]
-struct BoxPair {
-    box_1: (i64, i64, i64),
-    box_2: (i64, i64, i64),
-    distance: f64,
-}
-
-impl BoxPair {
-    pub fn new(box_1: &(i64, i64, i64), box_2: &(i64, i64, i64)) -> Self {
-        let distance = ((
-            (box_1.0 - box_2.0).pow(2) + 
-            (box_1.1 - box_2.1).pow(2) + 
-            (box_1.2 - box_2.2).pow(2)) as f64).sqrt();
-        Self {box_1: *box_1, box_2: *box_2, distance}
-    }
-}
-
 fn find<'a>(
     parent: &mut HashMap<&'a (i64, i64, i64), &'a (i64, i64, i64)>,
     x: &'a (i64, i64, i64)
@@ -42,24 +25,26 @@ pub fn part1(input: &str, max_pairs: usize) -> usize {
                 .collect();
             (parts[0], parts[1], parts[2])
         })
-        .collect(); 
-    let mut pairs: Vec<BoxPair> = Vec::new();
+        .collect();
+    let mut pairs: Vec<(usize, usize, f64)> = Vec::new();
     for i in 0..boxes.len() {
         for j in i + 1..boxes.len() {
-            let pair = BoxPair::new(&boxes[i], &boxes[j]);
-            pairs.push(pair);
+            let dx = boxes[i].0 - boxes[j].0;
+            let dy = boxes[i].1 - boxes[j].1;
+            let dz = boxes[i].2 - boxes[j].2;
+            let dist = ((dx*dx + dy*dy + dz*dz) as f64).sqrt();
+            pairs.push((i, j, dist));
         }
     }
-    pairs.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
+    pairs.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
     let selected_pairs = &pairs[..max_pairs.min(pairs.len())];
-    
     let mut parent: HashMap<&(i64,i64,i64), &(i64,i64,i64)> = HashMap::new();
     for b in &boxes {
         parent.insert(b, b);
     }
-    for pair in selected_pairs {
-        let root1 = find(&mut parent, &pair.box_1);
-        let root2 = find(&mut parent, &pair.box_2);
+    for &(i, j, _) in selected_pairs {
+        let root1 = find(&mut parent, &boxes[i]);
+        let root2 = find(&mut parent, &boxes[j]);
         if root1 != root2 {
             parent.insert(root1, root2);
         }
@@ -72,12 +57,14 @@ pub fn part1(input: &str, max_pairs: usize) -> usize {
     let mut lengths: Vec<usize> = circuits.values().map(|c| c.len()).collect();
     lengths.sort_by(|a, b| b.cmp(a));
     let top3 = &lengths[..3.min(lengths.len())];
-    let product: usize = top3.iter().product();
-    product
+    top3.iter().product()
 }
 
+
 pub fn part2(input: &str) -> usize {
-    let content = fs::read_to_string(input).expect("failed to read input file");
+    let content = std::fs::read_to_string(input).expect("failed to read input file");
+
+    // Parse boxes
     let boxes: Vec<(i64, i64, i64)> = content
         .lines()
         .map(str::trim)
@@ -85,33 +72,54 @@ pub fn part2(input: &str) -> usize {
         .map(|line| {
             let parts: Vec<i64> = line
                 .split(',')
-                .map(|s| s.trim().parse::<i64>().unwrap())
+                .map(|s| s.trim().parse().unwrap())
                 .collect();
             (parts[0], parts[1], parts[2])
         })
-        .collect(); 
-    let mut pairs: Vec<BoxPair> = Vec::new();
-    for i in 0..boxes.len() {
-        for j in i + 1..boxes.len() {
-            let pair = BoxPair::new(&boxes[i], &boxes[j]);
-            pairs.push(pair);
+        .collect();
+
+    let n = boxes.len();
+
+    // Generate all pairs with distances
+    let mut pairs: Vec<(usize, usize, f64)> = Vec::with_capacity(n*(n-1)/2);
+    for i in 0..n {
+        for j in i+1..n {
+            let dx = boxes[i].0 - boxes[j].0;
+            let dy = boxes[i].1 - boxes[j].1;
+            let dz = boxes[i].2 - boxes[j].2;
+            let dist = ((dx*dx + dy*dy + dz*dz) as f64).sqrt();
+            pairs.push((i, j, dist));
         }
     }
-    pairs.sort_by(|a, b| a.distance.partial_cmp(&b.distance).unwrap());
-    let mut last_merge: Option<(&BoxPair)> = None;
-    
-    let mut parent: HashMap<&(i64,i64,i64), &(i64,i64,i64)> = HashMap::new();
-    for b in &boxes {
-        parent.insert(b, b);
+
+    pairs.sort_by(|a, b| a.2.partial_cmp(&b.2).unwrap());
+    let mut parent: Vec<usize> = (0..n).collect();
+    let mut component_count = n;
+
+    fn find(parent: &mut [usize], x: usize) -> usize {
+        if parent[x] != x {
+            parent[x] = find(parent, parent[x]); // path compression
+        }
+        parent[x]
     }
-    for pair in &pairs {
-        let root1 = find(&mut parent, &pair.box_1);
-        let root2 = find(&mut parent, &pair.box_2);
-        if root1 != root2 {
-            parent.insert(root1, root2);
-            last_merge = Some(pair);
+
+    let mut last_pair = (0, 0, 0.0);
+
+    for &(i, j, dist) in &pairs {
+        let root_i = find(&mut parent, i);
+        let root_j = find(&mut parent, j);
+
+        if root_i != root_j {
+            parent[root_i] = root_j;
+            component_count -= 1;
+            last_pair = (i, j, dist);
+
+            if component_count == 1 {
+                break;
+            }
         }
     }
-    let last = last_merge.unwrap();
-    (last.box_1.0 * last.box_2.0) as usize
+
+    // Return product of x-coordinates of the last merged pair
+    (boxes[last_pair.0].0 * boxes[last_pair.1].0) as usize
 }
