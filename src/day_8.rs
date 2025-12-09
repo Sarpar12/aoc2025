@@ -18,7 +18,6 @@ impl BoxPair {
     }
 }
 
-// Union-Find helper
 fn find<'a>(
     parent: &mut HashMap<&'a (i64, i64, i64), &'a (i64, i64, i64)>,
     x: &'a (i64, i64, i64)
@@ -115,14 +114,4 @@ pub fn part2(input: &str) -> usize {
     }
     let last = last_merge.unwrap();
     (last.box_1.0 * last.box_2.0) as usize
-    // let mut circuits: HashMap<&(i64,i64,i64), Vec<&(i64,i64,i64)>> = HashMap::new();
-    // for b in &boxes {
-    //     let root = find(&mut parent, b);
-    //     circuits.entry(root).or_default().push(b);
-    // }
-    // let mut lengths: Vec<usize> = circuits.values().map(|c| c.len()).collect();
-    // lengths.sort_by(|a, b| b.cmp(a));
-    // let top3 = &lengths[..3.min(lengths.len())];
-    // let product: usize = top3.iter().product();
-    // product
 }
