@@ -8,4 +8,4 @@ description = "For Advent of Code 2025"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-# Add your dependencies here
+ordered-float = "3"
