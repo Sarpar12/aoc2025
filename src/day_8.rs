@@ -12,6 +12,7 @@ fn find<'a>(
     parent[x]
 }
 
+#[allow(dead_code)]
 pub fn part1(input: &str, max_pairs: usize) -> usize {
     let content = fs::read_to_string(input).expect("failed to read input file");
     let boxes: Vec<(i64, i64, i64)> = content
@@ -60,6 +61,7 @@ pub fn part1(input: &str, max_pairs: usize) -> usize {
     top3.iter().product()
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &str) -> usize {
     let content = std::fs::read_to_string(input).expect("failed to read input file");
     let boxes: Vec<(i64, i64, i64)> = content
