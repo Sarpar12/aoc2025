@@ -1,5 +1,6 @@
 use std::fs;
 
+#[allow(dead_code)]
 pub fn part1(input: &str) -> i64 {
     let contents = fs::read_to_string(input).unwrap();
     let locs: Vec<(i64, i64)> = contents
@@ -26,6 +27,7 @@ pub fn part1(input: &str) -> i64 {
     current_max
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &str) -> i64 {
     // Read red tile coordinates
     let red: Vec<(i64, i64)> = fs::read_to_string(input)
@@ -81,7 +83,6 @@ pub fn part2(input: &str) -> i64 {
             }
         }
     }
-
     max_area
 }
 
