@@ -1,7 +1,7 @@
-use std::fs;
-use std::collections::VecDeque;
-use std::collections::HashSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::collections::VecDeque;
+use std::fs;
 
 pub fn part1(input: &str) -> i32 {
     let contents = fs::read_to_string(input).unwrap();
@@ -17,13 +17,16 @@ pub fn part1(input: &str) -> i32 {
             .chars()
             .rev() // last char -> bit 0
             .enumerate()
-            .fold(0i16, |acc, (i, c)| {
-                if c == '#' {
-                    acc | (1 << i)
-                } else {
-                    acc
-                }
-            });
+            .fold(
+                0i16,
+                |acc, (i, c)| {
+                    if c == '#' {
+                        acc | (1 << i)
+                    } else {
+                        acc
+                    }
+                },
+            );
 
         // ---- masks: indices relative to pattern width ----
         let masks: Vec<i16> = parts
@@ -70,7 +73,6 @@ pub fn part1(input: &str) -> i32 {
     total
 }
 
-
 const INF: i64 = i64::MAX / 4;
 
 fn solve_recursive(
@@ -82,7 +84,8 @@ fn solve_recursive(
         return v;
     }
 
-    // Base case: all joltages are 0 -> no presses needed
+    // Base case: if every column is 0, we need no further presses.
+    // This corresponds to f(0,0,...,0) = 0 in the writeup.
     if state.iter().all(|&x| x == 0) {
         memo.insert(state.clone(), 0);
         return 0;
@@ -92,17 +95,29 @@ fn solve_recursive(
     let b = buttons.len();
     let mut best = INF;
 
-    // Temporary vector: how many times each column is incremented in phase 1
+    // Recursive strategy (high level):
+    // - Try all subsets of buttons to press once in a first phase (like the parity-only solution in Part 1).
+    // - Subtract a subset's effects from `state`. If any column would go negative, skip it.
+    // - If all remaining values are even, divide them by two and recurse on the halved problem.
+    // - The total presses for this subset = presses_in_phase1 + 2 * presses_for_halved.
+    // - Take the minimum over all subsets, cache results, and treat INF as unreachable.
+
+    // Temporary vector: how many times each column is incremented by the chosen phase-1 buttons
+    // (contrib[j] = number of selected buttons that affect column j)
     let mut contrib = vec![0i64; n];
 
-    // Enumerate all 2^B subsets of buttons as possible phase-1 sets
+    // Enumerate all 2^B subsets of buttons as the candidate first-phase presses.
+    // Pressing a button more than once in phase 1 is unnecessary (redundant modulo 2),
+    // so we consider press-once-or-not (subset membership).
     let total_subsets: u64 = 1u64 << b;
 
     for subset in 0..total_subsets {
+        // reset contribution counts for this subset, and track how many buttons we pressed in phase1
         contrib.fill(0);
         let mut presses_phase1 = 0i64;
 
-        // Build contrib[j] = number of buttons in this subset affecting column j
+        // For each button in the subset, increment `presses_phase1` and add 1 to each column it affects.
+        // contrib[j] will end up holding how many times column j is decreased by this phase-1 choice.
         for (btn_idx, cols) in buttons.iter().enumerate() {
             if (subset >> btn_idx) & 1 == 1 {
                 presses_phase1 += 1;
@@ -112,7 +127,9 @@ fn solve_recursive(
             }
         }
 
-        // Compute remaining joltages after phase 1, and check if all are even & non-negative
+        // After applying this phase-1 choice, compute remaining joltages.
+        // If any column would go negative, or the remaining value is odd, this subset is invalid.
+        // Otherwise, halve the remaining values and recurse on the reduced instance.
         let mut next_state = Vec::with_capacity(n);
         let mut ok = true;
 
@@ -120,7 +137,8 @@ fn solve_recursive(
             let t = state[j];
             let used = contrib[j];
 
-            // Can't subtract more than we have
+            // Can't subtract more than we have: this subset would require pressing a button
+            // that reduces column j below zero.
             if used > t {
                 ok = false;
                 break;
@@ -128,12 +146,13 @@ fn solve_recursive(
 
             let rem = t - used;
 
-            // After phase 1, remaining joltages must all be even
+            // Remaining must be even (parity constraint) so we can halve them and recurse.
             if rem & 1 != 0 {
                 ok = false;
                 break;
             }
 
+            // Divide by 2 to produce the smaller instance for recursion.
             next_state.push(rem / 2);
         }
 
@@ -141,7 +160,9 @@ fn solve_recursive(
             continue;
         }
 
-        // Phase 2: same sequence done twice on the halved problem
+        // Phase 2: solve the halved instance (sub). If it's reachable, we will repeat
+        // the halved sequence twice (hence the 2 * sub factor), and add the presses done
+        // in phase 1. Keep the minimum over all subsets.
         let sub = solve_recursive(&next_state, buttons, memo);
         if sub == INF {
             continue;
@@ -153,6 +174,7 @@ fn solve_recursive(
         }
     }
 
+    // Cache the result (best may be INF to indicate unreachable).
     memo.insert(state.clone(), best);
     best
 }
